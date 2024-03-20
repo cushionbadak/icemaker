@@ -776,13 +776,10 @@ fn main() {
     // argument overwriting
     if let Some(config_file_path) = &args.custom_config {
         let custom_config: CustomConfig = {
-            let config_file =
+            let config_file_contents =
                 std::fs::read_to_string(&config_file_path).expect("failed to read config");
-            let read = match std::fs::read_to_string(config_file) {
-                Ok(content) => content,
-                Err(_) => panic!("failed to read '{}'", config_file_path.display()),
-            };
-            match serde_json::from_str::<CustomConfig>(&read) {
+
+            match serde_json::from_str::<CustomConfig>(&config_file_contents) {
                 Ok(config) => config,
                 Err(e) => {
                     eprintln!("Failed to parse config, is it a json file?");
