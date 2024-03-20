@@ -471,16 +471,21 @@ impl Executable {
     pub fn path(&self) -> String {
         match self {
             Executable::Rustc => {
-                let mut p = home::rustup_home().unwrap();
-                p.push("toolchains");
-                p.push(if *LOCAL_DEBUG_ASSERTIONS {
-                    "local-debug-assertions"
+                let rustc_path_str_set = unsafe { !&RUSTC_PATH_STR.is_empty() };
+                if rustc_path_str_set {
+                    unsafe { RUSTC_PATH_STR.clone() }
                 } else {
-                    "master"
-                });
-                p.push("bin");
-                p.push("rustc");
-                p.display().to_string()
+                    let mut p = home::rustup_home().unwrap();
+                    p.push("toolchains");
+                    p.push(if *LOCAL_DEBUG_ASSERTIONS {
+                        "local-debug-assertions"
+                    } else {
+                        "master"
+                    });
+                    p.push("bin");
+                    p.push("rustc");
+                    p.display().to_string()
+                }
             }
             Executable::Clippy => {
                 let mut p = home::rustup_home().unwrap();
