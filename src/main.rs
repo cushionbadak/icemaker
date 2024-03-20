@@ -792,6 +792,9 @@ fn main() {
             }
         };
 
+        // in currently custom-logic, we limit the executable only to rustc
+        args.rustc = true;
+
         dbg!(&custom_config.rustc_path);
         dbg!(&args.threads);
         dbg!(&args.projects);
