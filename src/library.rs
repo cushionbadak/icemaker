@@ -2,6 +2,7 @@ use std::io;
 
 use clap::Parser;
 use itertools::Itertools;
+use serde::{Deserialize, Serialize};
 
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
@@ -97,6 +98,16 @@ pub(crate) struct Args {
 
     #[clap(long)]
     pub(crate) marker: bool,
+
+    #[clap(long)]
+    pub(crate) custom_config: Option<std::path::PathBuf>,
+}
+
+#[derive(Debug, Default, Serialize, Deserialize, Clone, Eq, PartialEq)]
+pub(crate) struct CustomConfig {
+    pub rustc_path: String,
+    pub threads: usize,
+    pub projects: Vec<std::path::PathBuf>,
 }
 
 /// check whether a file uses features or not

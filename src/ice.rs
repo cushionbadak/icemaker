@@ -465,6 +465,8 @@ pub enum Executable {
 
 static LOCAL_DEBUG_ASSERTIONS: Lazy<bool> = Lazy::new(|| Args::parse().local_debug_assertions);
 
+pub static mut RUSTC_PATH_STR: std::string::String = String::new();
+
 impl Executable {
     pub fn path(&self) -> String {
         match self {

@@ -771,7 +771,37 @@ fn main() {
     // https://github.com/rust-lang/rust/pull/108714
     std::env::set_var("RUSTC_ICE", "0");
 
-    let args = Args::parse();
+    let mut args = Args::parse();
+
+    // argument overwriting
+    if let Some(config_file_path) = &args.custom_config {
+        let custom_config: CustomConfig = {
+            let config_file =
+                std::fs::read_to_string(&config_file_path).expect("failed to read config");
+            let read = match std::fs::read_to_string(config_file) {
+                Ok(content) => content,
+                Err(_) => panic!("failed to read '{}'", config_file_path.display()),
+            };
+            match serde_json::from_str::<CustomConfig>(&read) {
+                Ok(config) => config,
+                Err(e) => {
+                    eprintln!("Failed to parse config, is it a json file?");
+                    eprintln!("original error: '{e:?}'");
+                    std::process::exit(1);
+                }
+            }
+        };
+
+        dbg!(&custom_config.rustc_path);
+        dbg!(&args.threads);
+        dbg!(&args.projects);
+
+        unsafe {
+            RUSTC_PATH_STR = custom_config.rustc_path;
+        }
+        args.threads = custom_config.threads;
+        args.projects = custom_config.projects;
+    }
 
     // if we have a --global-tempdir-path passed, create all tempdirs in there, otherwise use TempDir default which is /tmp/
     let global_tempdir = if let Some(ref custom_tempdir_path) = args.global_tempdir_path {
