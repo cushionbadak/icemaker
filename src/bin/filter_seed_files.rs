@@ -97,7 +97,7 @@ fn get_exception_list(root_path: &PathBuf) -> Vec<PathBuf> {
 fn _seed_able_files() -> Vec<String> {
     let root_path = std::env::current_dir().expect("no cwd!");
 
-    println!("collecting files..");
+    eprintln!("collecting files..");
     // files we use as dataset
     let files = WalkDir::new(root_path)
         .into_iter()
@@ -114,7 +114,7 @@ fn _seed_able_files() -> Vec<String> {
     // rust!
     parser.set_language(tree_sitter_rust::language()).unwrap();
 
-    println!("parsing {} files..", files.len());
+    eprintln!("parsing {} files..", files.len());
 
     tqdm(files.iter())
         .style(tqdm::Style::Block)
@@ -132,7 +132,7 @@ fn seed_able_files_partition() -> (Vec<String>, Vec<String>) {
 
     let exception_list = get_exception_list(&root_path);
 
-    println!("Collecting Rust source files...");
+    eprintln!("Collecting Rust source files...");
 
     let files = tqdm(WalkDir::new(root_path).into_iter())
         .style(tqdm::Style::Block)
@@ -151,7 +151,7 @@ fn seed_able_files_partition() -> (Vec<String>, Vec<String>) {
         .set_language(tree_sitter_rust::language())
         .expect("Failed to set language to Rust");
 
-    println!("Parsing {} files...", files.len());
+    eprintln!("Parsing {} files...", files.len());
 
     let (satisfying, unsatisfying): (Vec<_>, Vec<_>) = tqdm(files.into_iter())
         .style(tqdm::Style::Block)
@@ -179,31 +179,38 @@ fn seed_able_files_partition() -> (Vec<String>, Vec<String>) {
 fn main() {
     let (satisfying, unsatisfying) = seed_able_files_partition();
 
-    println!("Found {} files satisfying the condition.", satisfying.len());
-    println!(
+    eprintln!("Found {} files satisfying the condition.", satisfying.len());
+    eprintln!(
         "Found {} files not satisfying the condition.",
         unsatisfying.len()
     );
 
-    if !unsatisfying.is_empty() {
-        prompt_for_removal(unsatisfying);
+    //if !unsatisfying.is_empty() {
+    //    _prompt_for_removal(unsatisfying);
+    //}
+
+    // if argument "-print-sat" is passed, print the list of satisfying files
+    if std::env::args().any(|arg| arg == "-print-sat") {
+        for file in &satisfying {
+            println!("{}", file);
+        }
     }
 }
 
-fn prompt_for_removal(files_to_remove: Vec<String>) {
+fn _prompt_for_removal(files_to_remove: Vec<String>) {
     // Display up to five file paths
     let preview_files = files_to_remove.iter().take(5);
-    println!(
+    eprintln!(
         "\nThe following files did not satisfy the conditions and will be deleted if you proceed:"
     );
     for file in preview_files {
-        println!("  - {}", file);
+        eprintln!("  - {}", file);
     }
     if files_to_remove.len() > 5 {
-        println!("  ...and {} more files.", files_to_remove.len() - 5);
+        eprintln!("  ...and {} more files.", files_to_remove.len() - 5);
     }
 
-    println!(
+    eprintln!(
         "\nDo you want to proceed with removing these {} file(s)? [yes/NO]: ",
         files_to_remove.len()
     );
@@ -218,7 +225,7 @@ fn prompt_for_removal(files_to_remove: Vec<String>) {
             if let Err(e) = fs::remove_file(Path::new(&file_path)) {
                 eprintln!("Failed to delete {}: {}", file_path, e);
             } else {
-                println!("Successfully deleted {}", file_path);
+                eprintln!("Successfully deleted {}", file_path);
             }
         }
     }
