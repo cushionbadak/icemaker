@@ -6,7 +6,7 @@ use rand::Rng;
 use tree_sitter::{Parser, Tree};
 use tree_splicer::splice::{Config, Splicer};
 
-pub(crate) const IN_CODE_FP_KEYWORDS: &[&str] = &[
+pub const IN_CODE_FP_KEYWORDS: &[&str] = &[
     "panicked at",
     "RUST_BACKTRACE=",
     "(core dumped)",
@@ -72,7 +72,7 @@ pub(crate) fn splice_file(path: &PathBuf) -> Vec<String> {
     let mut parser = Parser::new();
     parser.set_timeout_micros(10_000_000);
     // rust!
-    parser.set_language(&tree_sitter_rust::language()).unwrap();
+    parser.set_language(tree_sitter_rust::language()).unwrap();
 
     let tree = parser.parse(&file_content, None);
 
@@ -170,7 +170,7 @@ pub(crate) fn splice_file_from_set(
 }
 
 // such files will most likely just causes known crashes or hang the splicing
-pub(crate) fn ignore_file_for_splicing(file: &PathBuf) -> bool {
+pub fn ignore_file_for_splicing(file: &PathBuf) -> bool {
     const LINE_LIMIT: usize = 400; // was 1000
 
     let content = std::fs::read_to_string(file).unwrap_or_default();

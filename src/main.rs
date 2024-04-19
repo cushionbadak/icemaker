@@ -2772,7 +2772,7 @@ fn codegen_tree_splicer_omni() {
     parser.set_timeout_micros(10_000_000);
 
     // rust!
-    parser.set_language(&tree_sitter_rust::language()).unwrap();
+    parser.set_language(tree_sitter_rust::language()).unwrap();
 
     println!("parsing {} files..", files.len());
 
