@@ -21,7 +21,7 @@ pub fn main() {
 
     if let Some(filename) = args.check_file {
         let path = std::path::PathBuf::from(filename);
-        if ignore_file_for_splicing(&path) {
+        if !ignore_file_for_splicing(&path) {
             println!("good");
         } else {
             println!("bad");
@@ -35,7 +35,7 @@ pub fn main() {
                 if let Some(ext) = path.extension() {
                     if path.is_file() && ext.to_string_lossy() == "rs" {
                         match (
-                            ignore_file_for_splicing(&path.to_path_buf()),
+                            !ignore_file_for_splicing(&path.to_path_buf()),
                             args.print_bads,
                         ) {
                             (true, false) => println!("{}", path.canonicalize().unwrap().display()),
